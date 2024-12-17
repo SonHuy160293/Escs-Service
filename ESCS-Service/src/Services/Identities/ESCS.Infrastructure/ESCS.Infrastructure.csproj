@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Core.Infrastructure\Core.Infrastructure.csproj" />
+    <ProjectReference Include="..\ESCS.Application\ESCS.Application.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Oracle.EntityFrameworkCore" Version="6.21.160" />
+	</ItemGroup>
+</Project>

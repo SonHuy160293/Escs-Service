@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cache\UserEmailConfig.Cache\Identity.Cache.csproj" />
+    <ProjectReference Include="..\Emails.Domain\Emails.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

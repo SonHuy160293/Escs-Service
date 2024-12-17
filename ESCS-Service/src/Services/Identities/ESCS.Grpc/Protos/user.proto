@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option csharp_namespace = "ESCS.Grpc.Protos";
+
+import "google/protobuf/empty.proto";
+package user;
+
+
+message UserEmailConfig{
+	int64 id = 1;
+    string smtpEmail = 2;
+    int32 smtpPort = 3;
+    string smtpPassword = 4;
+    int64 userId = 5;
+    int64 serviceId = 6;
+	bool isActive = 7;
+}
+
+message ValidateUserApiKeyRequest{
+	string key = 1;
+	string requestPath = 2;
+	string method = 3;  
+}
+
+message ValidateUserApiKeyResponse{
+	int64 userId = 1;
+}
+
+
+message GetUserEmailConfigByEmailRequest{
+	string email = 1;
+}
+
+message GetUserEmailConfigByEmailResponse{
+	 UserEmailConfig userEmailConfig = 1;
+}
+
+
+service UserProtoService{
+	rpc ValidateUserApiKey(ValidateUserApiKeyRequest) returns (ValidateUserApiKeyResponse);
+	rpc GetUserEmailConfigByEmail(GetUserEmailConfigByEmailRequest) returns (GetUserEmailConfigByEmailResponse);
+}

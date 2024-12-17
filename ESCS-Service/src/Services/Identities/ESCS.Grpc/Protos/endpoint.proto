@@ -1,0 +1,27 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "ESCS.Grpc.Protos";
+
+import "google/protobuf/empty.proto";
+package endpoint;
+
+
+message User{
+	int64 id = 1;
+	string email = 2;
+}
+
+message GetUserRegisteredEndpointRequest{
+	string url = 1;
+	string method = 2;
+	
+}
+
+message GetUserRegisteredEndpointResponse{
+	repeated User users = 1;
+}
+
+service EndpointProtoService{
+	rpc GetUserRegisteredEndpoint(GetUserRegisteredEndpointRequest) returns (GetUserRegisteredEndpointResponse);
+	
+}

@@ -70,5 +70,35 @@ namespace Logs.API.Controllers
 
             return Ok(log);
         }
+
+        [HttpPost("search-log")]
+        public async Task<IActionResult> SearchLog([FromBody] LogSearchRequest logSearchRequest)
+        {
+            var logs = await _logService.GetLogsPaging(logSearchRequest);
+            return Ok(logs);
+        }
+
+        [HttpGet("field-with-type")]
+        public async Task<IActionResult> GetFieldWithType(string index)
+        {
+            var fields = await _logService.GetAllFieldsWithTypes(index);
+            var fieldResult = fields.Where(f => !f.FieldType.Equals("nested")).Select(f => new LogField
+            {
+                Name = f.FieldName,
+                Type = f.FieldType,
+            });
+
+            return Ok(fieldResult);
+        }
+
+
+        [HttpGet("log-response")]
+        public async Task<IActionResult> GetLogResponseByCorrelationId(string index, string correlationId)
+        {
+            var field = await _logService.GetLogResponseByCorrelationId(index, correlationId);
+
+
+            return Ok(field);
+        }
     }
 }

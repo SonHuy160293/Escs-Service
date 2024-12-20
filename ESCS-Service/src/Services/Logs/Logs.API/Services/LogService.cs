@@ -1126,5 +1126,120 @@ namespace Logs.API.Services
                 throw new LogInternalException($"GetLogsPaging catch {exceptionError}");
             }
         }
+
+        public async Task<IEnumerable<(string FieldName, string FieldType)>> GetAllFieldsWithTypes(string index)
+        {
+            try
+            {
+                // Replace "your-index-name" with the actual name of your index
+                var response = await _elasticSearchClient.Indices.GetMappingAsync(new GetMappingRequest(index));
+
+                if (!response.IsValidResponse || !response.Indices.Any())
+                {
+                    throw new LogInternalException("Failed to retrieve index mapping.");
+                }
+
+                // Assuming you have a single index
+                var indexMapping = response.Indices.First().Value;
+
+                // Get the properties dictionary
+                var properties = indexMapping.Mappings.Properties;
+
+                // Flatten the properties to get all field paths and types
+                var fieldsWithTypes = GetAllFieldsWithTypes(properties);
+
+                return fieldsWithTypes;
+            }
+            catch (Exception ex)
+            {
+                var exceptionError = ExceptionError.Create(ex);
+                _logger.LogError("Retrieve fields catch exception {Exception}", exceptionError);
+
+                throw;
+            }
+        }
+
+        // Helper method to flatten properties and get all field paths with types
+        private List<(string FieldName, string FieldType)> GetAllFieldsWithTypes(Properties properties, string parentPath = "")
+        {
+            try
+            {
+                var fieldsWithTypes = new List<(string FieldName, string FieldType)>();
+
+                foreach (var prop in properties)
+                {
+                    var fieldName = parentPath + prop.Key;
+
+                    // Determine the field type
+                    string fieldType = prop.Value.Type;
+
+                    if (prop.Value is ObjectProperty objectProp && objectProp.Properties != null)
+                    {
+                        // Recursively get nested fields
+                        var nestedFieldsWithTypes = GetAllFieldsWithTypes(objectProp.Properties, fieldName + ".");
+                        fieldsWithTypes.AddRange(nestedFieldsWithTypes);
+                    }
+                    else
+                    {
+                        fieldsWithTypes.Add((fieldName, fieldType));
+                    }
+                }
+
+                return fieldsWithTypes;
+            }
+            catch (Exception ex)
+            {
+                var exceptionError = ExceptionError.Create(ex);
+                throw new LogInternalException($"GetAllFieldsWithTypes catch {exceptionError}");
+            }
+        }
+
+        public async Task<LogRecord> GetLogResponseByCorrelationId(string index, string correlationId)
+        {
+            try
+            {
+                // Build the query
+                var mustQueries = new List<Query>();
+
+                mustQueries.Add(new TermQuery(field: "fields.LogType.raw")
+                {
+                    Value = "Response"
+                });
+                mustQueries.Add(new TermQuery(field: "fields.CorrelationId.raw")
+                {
+                    Value = correlationId
+                });
+
+                var query = new BoolQuery { Filter = mustQueries };
+                // Execute the search
+                var response = await _elasticSearchClient.SearchAsync<LogRecord>(s => s
+                                            .Index(index)
+                                            .Query(query)
+
+                                            );
+
+
+                if (!response.IsValidResponse)
+                {
+                    throw new LogInternalException("Elasticsearch query failed.");
+                }
+
+                var logRecords = response.Hits.Select(hit => new LogRecord
+                {
+                    Id = hit.Id, // Extract _id from the hit metadata
+                    Timestamp = hit.Source.Timestamp,
+                    Level = hit.Source.Level,
+                    Message = hit.Source.Message,
+                    Fields = hit.Source.Fields
+                }).FirstOrDefault() ?? default!;
+
+                return logRecords;
+            }
+            catch (Exception ex)
+            {
+                var exceptionError = ExceptionError.Create(ex);
+                throw new LogInternalException($"GetLogResponseByCorrelationId catch {exceptionError}");
+            }
+        }
     }
 }

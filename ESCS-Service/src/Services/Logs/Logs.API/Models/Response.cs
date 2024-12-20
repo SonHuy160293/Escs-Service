@@ -62,4 +62,10 @@ namespace Logs.API.Models
     {
         public IEnumerable<long> UserIds { get; set; }
     }
+
+    public class LogField
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+    }
 }

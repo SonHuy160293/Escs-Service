@@ -41,34 +41,43 @@ namespace ESCS.Application.Features.Commands.UserEmailServiceConfigs
             _cachedUserEmailConfigRepository = cachedUserEmailConfigRepository;
         }
 
+        //Handling update user email config
         public async Task<BaseResult> Handle(UpdateEmailServiceConfigCommand request, CancellationToken cancellationToken)
         {
             try
             {
+
+                //get email config by Id
                 var emailServiceConfig = await _unitOfWork.UserEmailServiceConfigurationRepository.GetById(request.Id);
 
-                var cacheUserEmailConfig = await _cachedUserEmailConfigRepository.GetUserEmailConfig(emailServiceConfig.SmtpEmail);
-                if (cacheUserEmailConfig != null)
-                {
-                    await _cachedUserEmailConfigRepository.DeleteUserEmailConfig(emailServiceConfig.SmtpEmail);
-                }
-
+                //check if config not exists then return
                 if (emailServiceConfig is null)
                 {
                     throw new NotFoundException($"Config with id:{request.Id} not exist");
                 }
 
 
+                //get email config from redis
+                var cacheUserEmailConfig = await _cachedUserEmailConfigRepository.GetUserEmailConfig(emailServiceConfig.SmtpEmail);
+
+                //if redis contains config then remove
+                if (cacheUserEmailConfig != null)
+                {
+                    await _cachedUserEmailConfigRepository.DeleteUserEmailConfig(emailServiceConfig.SmtpEmail);
+                }
+
+
+                //mapping
                 emailServiceConfig.SmtpPort = request.SmtpPort;
                 emailServiceConfig.SmtpEmail = request.SmtpEmail;
                 emailServiceConfig.SmtpPassword = request.SmtpPassword;
                 emailServiceConfig.IsActive = request.IsActive;
 
+                //update object
                 _unitOfWork.UserEmailServiceConfigurationRepository.Update(emailServiceConfig);
 
+                //save change
                 await _unitOfWork.SaveChangesAsync();
-
-
 
                 return BaseResult.Success();
             }

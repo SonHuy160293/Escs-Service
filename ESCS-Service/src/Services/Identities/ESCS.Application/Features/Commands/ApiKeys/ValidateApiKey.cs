@@ -30,15 +30,16 @@ namespace ESCS.Application.Features.Commands.ApiKeys
             _unitOfWork = identityUnitOfWork;
         }
 
+        //Handling validate api key
         public async Task<BaseResult<long>> Handle(ValidateUserApiKeyCommand request, CancellationToken cancellationToken)
         {
             try
             {
-
+                //get key by key string
                 var key = await _unitOfWork.UserApiKeyRepository
                     .FindEntityByQuery(k => k.Key == request.Key) ?? throw new NotFoundException("Key not found"); ;
 
-
+                //check if key is allowed to endpoint
                 var allowedEndpoint = await _unitOfWork.KeyAllowedEndpointRepository.
                     FindEntityByQuery(e => e.UserApiKeyId == key.Id && e.ServiceEndpoint.Url == request.RequestPath
                                       && e.ServiceEndpoint.Method.ToUpper() == request.Method && e.IsActive == true && e.UserApiKey.IsActive, false,

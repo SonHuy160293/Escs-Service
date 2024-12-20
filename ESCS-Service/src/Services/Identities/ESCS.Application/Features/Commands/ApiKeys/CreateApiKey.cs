@@ -32,21 +32,25 @@ namespace ESCS.Application.Features.Commands.ApiKeys
 
 
 
+        //handling create user api key
         public async Task<BaseResult<long>> Handle(CreateUserApiKeyCommand request, CancellationToken cancellationToken)
         {
 
             try
             {
+                //get user by id
                 var user = await _unitOfWork.UserRepository.GetById(request.UserId);
 
+                //check if user is exists
                 if (user is null)
                 {
                     throw new NotFoundException("User not found");
                 }
 
-
+                //generate key
                 var secureKey = Core.Application.Extensions.Extension.GenerateSecureApiKey();
 
+                //create key object
                 var userApiKey = new UserApiKey
                 {
                     ServiceId = request.ServiceId,
@@ -55,8 +59,10 @@ namespace ESCS.Application.Features.Commands.ApiKeys
                     IsActive = true
                 };
 
+                //add key to db
                 await _unitOfWork.UserApiKeyRepository.Add(userApiKey);
 
+                //save changes
                 await _unitOfWork.SaveChangesAsync();
 
                 return BaseResult<long>.Success(userApiKey.Id);

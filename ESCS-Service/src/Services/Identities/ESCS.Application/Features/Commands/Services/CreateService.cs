@@ -16,6 +16,7 @@ namespace ESCS.Application.Features.Commands.Services
         public string BaseUrl { get; set; }
     }
 
+    //Handling create service
     public class CreateServiceHandler : ICommandHandler<CreateServiceCommand, BaseResult>
     {
 
@@ -35,8 +36,10 @@ namespace ESCS.Application.Features.Commands.Services
 
             try
             {
+                //mapping
                 var service = _mapper.Map<Service>(request);
 
+                //add object to db
                 await _unitOfWork.ServiceRepository.Add(service);
 
                 await _unitOfWork.SaveChangesAsync();

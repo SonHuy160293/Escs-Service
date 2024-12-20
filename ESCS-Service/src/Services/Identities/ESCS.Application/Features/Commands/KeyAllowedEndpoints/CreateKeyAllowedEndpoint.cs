@@ -20,6 +20,7 @@ namespace ESCS.Application.Features.Commands.KeyAllowedEndpoints
 
     }
 
+    //Handling create allowed endpoint for api key
     public class CreateUserApiKeyHandler : ICommandHandler<CreateKeyAllowedEndpointCommand, BaseResult>
     {
 
@@ -39,15 +40,19 @@ namespace ESCS.Application.Features.Commands.KeyAllowedEndpoints
 
             try
             {
+                //get key from db by Id
                 var key = await _unitOfWork.UserApiKeyRepository.GetById(request.UserApiKeyId);
 
+                //check if key is exists or not
                 if (key is null)
                 {
                     throw new NotFoundException("Key not found");
                 }
 
+                //get endpoints by Id from db
                 var endpoints = await _unitOfWork.ServiceEndpointRepository.FindByQuery(e => request.EndpointId.Contains(e.Id));
 
+                //if > 1 endpoint not exist return
                 if (endpoints.Count() != request.EndpointId.Count())
                 {
                     throw new NotFoundException("Endpoint not found");
@@ -58,13 +63,16 @@ namespace ESCS.Application.Features.Commands.KeyAllowedEndpoints
                 foreach (var endpoint in endpoints)
                 {
 
+                    //check if endpoint is saved in redis
                     var endpointUser = await _cachedEndpointUserRepository.GetEndpointUser(endpoint.Url, endpoint.Method);
 
+                    //if endpoint is exists in redis then remove
                     if (endpointUser is not null)
                     {
                         await _cachedEndpointUserRepository.DeleteEndpointUser(endpoint.Url, endpoint.Method);
                     }
 
+                    //create key allowed object
                     var keyAllowedEndpoint = new KeyAllowedEndpoint
                     {
                         UserApiKeyId = request.UserApiKeyId,
@@ -72,12 +80,16 @@ namespace ESCS.Application.Features.Commands.KeyAllowedEndpoints
                         IsActive = true,
 
                     };
+
+                    //add object to list
                     keyAllowedList.Add(keyAllowedEndpoint);
 
                 }
 
+                //add list allowed to db
                 await _unitOfWork.KeyAllowedEndpointRepository.AddRange(keyAllowedList);
 
+                //save change
                 await _unitOfWork.SaveChangesAsync();
 
                 return BaseResult.Success();

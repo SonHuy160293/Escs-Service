@@ -35,15 +35,19 @@ namespace ESCS.Application.Features.Commands.Services
         {
             try
             {
+
+                //get service by Id from db
                 var service = await _unitOfWork.ServiceRepository.GetById(request.Id)
                ?? throw new NotFoundException($"Service with id:{request.Id} not found");
 
-
+                //mapping
                 service.Name = request.Name ?? service.Name;
                 service.BaseUrl = request.BaseUrl ?? service.BaseUrl;
 
+                //update object
                 _unitOfWork.ServiceRepository.Update(service);
 
+                //save change
                 await _unitOfWork.SaveChangesAsync();
 
                 return BaseResult.Success();

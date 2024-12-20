@@ -36,31 +36,39 @@ namespace ESCS.Application.Features.Commands.UserEmailServiceConfigs
             _logger = logger;
         }
 
+        //Handling create user email config
         public async Task<BaseResult> Handle(CreateEmailServiceConfigCommand request, CancellationToken cancellationToken)
         {
             try
             {
-
+                //get service by Id
                 var service = await _unitOfWork.ServiceRepository.GetById(request.ServiceId);
 
+                //if service not exist then return
                 if (service is null)
                 {
                     throw new NotFoundException($"Service with id:{request.ServiceId} is not found");
                 }
 
+                //check if email is used or not
                 var email = await _unitOfWork.UserEmailServiceConfigurationRepository.FindEntityByQuery(e => e.SmtpEmail == request.SmtpEmail);
 
+                //if exist then return
                 if (email is not null)
                 {
                     throw new ExistException($"{request.SmtpEmail} exist");
                 }
 
-
+                //mapping
                 var emailServiceConfig = _mapper.Map<UserEmailServiceConfiguration>(request);
+
+                //set default status to true
                 emailServiceConfig.IsActive = true;
 
+                //add object
                 await _unitOfWork.UserEmailServiceConfigurationRepository.Add(emailServiceConfig);
 
+                //save change
                 await _unitOfWork.SaveChangesAsync();
 
                 return BaseResult.Success();

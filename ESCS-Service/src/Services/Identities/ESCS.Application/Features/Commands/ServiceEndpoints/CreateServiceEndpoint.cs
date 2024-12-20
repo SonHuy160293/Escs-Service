@@ -35,31 +35,41 @@ namespace ESCS.Application.Features.Commands.ServiceEndpoints
             _mapper = mapper;
         }
 
+
+        //Handling create endpoint for service
         public async Task<BaseResult> Handle(CreateServiceEndpointCommand request, CancellationToken cancellationToken)
         {
 
             try
             {
+                //get service by Id
                 var service = await _unitOfWork.ServiceRepository.GetById(request.ServiceId);
 
+                //if service not exists, return
                 if (service is null)
                 {
                     throw new NotFoundException($"Service with id:{request.ServiceId} not found");
                 }
 
+                //get endpoint by url + method
                 var serviceEndpoint = await _unitOfWork.ServiceEndpointRepository.FindEntityByQuery(e => e.Url == request.Url && e.Method == request.Method);
 
+                //if endpoint exist then return
                 if (serviceEndpoint is not null)
                 {
                     throw new ExistException("Endpoint alrealdy existed");
                 }
 
+                //mapping
                 serviceEndpoint = _mapper.Map<ServiceEndpoint>(request);
 
+                //set default status
                 serviceEndpoint.IsActive = true;
 
+                //add endpoint to db
                 await _unitOfWork.ServiceEndpointRepository.Add(serviceEndpoint);
 
+                //save change
                 await _unitOfWork.SaveChangesAsync();
 
                 return BaseResult.Success();

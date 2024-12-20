@@ -37,29 +37,31 @@ namespace ESCS.Application.Features.Commands.ServiceEndpoints
             _logger = logger;
         }
 
+
+        //Handling update endpoint
         public async Task<BaseResult> Handle(UpdateServiceEndpointCommand request, CancellationToken cancellationToken)
         {
             try
             {
-
+                //get endpoint from db by Id
                 var serviceEndpoint = await _unitOfWork.ServiceEndpointRepository.GetById(request.Id);
 
+                //if endpoint not exist then return
                 if (serviceEndpoint == null)
                 {
                     throw new NotFoundException($"Endpoint with id:{request.Id} not found");
                 }
 
-
-
-
+                //mapping
                 serviceEndpoint.Url = request.Url ?? serviceEndpoint.Url;
                 serviceEndpoint.Method = request.Method ?? serviceEndpoint.Method;
                 serviceEndpoint.IsActive = request.IsActive;
                 serviceEndpoint.Description = request.Description ?? serviceEndpoint.Description;
 
-
+                //update object
                 _unitOfWork.ServiceEndpointRepository.Update(serviceEndpoint);
 
+                //save change
                 await _unitOfWork.SaveChangesAsync();
 
                 return BaseResult.Success();

@@ -34,6 +34,7 @@ namespace ESCS.Application.Features.Commands.Authentications
             _tokenService = tokenService;
         }
 
+        //handling create token for admin
         public async Task<BaseResult<TokenResponse>> Handle(CreateSystemTokenCommand request, CancellationToken cancellationToken)
         {
 

@@ -34,15 +34,18 @@ namespace ESCS.Application.Features.Commands.Authentications
             _tokenService = tokenService;
         }
 
+        //handling login
         public async Task<BaseResult<TokenResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
 
             try
             {
+                //get user by email
                 var user = await _unitOfWork.UserRepository
                .FindEntityByQuery(u => u.Email == request.Email, false)
                ?? throw new AuthenticationException("User not found");
 
+                //validate user infor
                 if ((bool)user.LockoutEnabled)
                 {
                     throw new AuthenticationException("User is locked");
@@ -53,6 +56,7 @@ namespace ESCS.Application.Features.Commands.Authentications
                     throw new AuthenticationException("Password is incorrect");
                 }
 
+                //get role of user
                 var role = await _unitOfWork.RoleRepository.GetById(user.RoleId);
 
                 var roles = new List<string>

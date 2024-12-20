@@ -33,22 +33,28 @@ namespace ESCS.Application.Features.Commands.Authentications
             _tokenService = tokenService;
         }
 
+
+        //Handling retrive new acccess token + refresh token
         public async Task<BaseResult<TokenResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
 
             try
             {
+                //get refresh tokem from db
                 var refreshTokenRecord = await _unitOfWork.RefreshTokenRepository
                 .FindEntityByQuery(t => t.Token == request.RefreshToken);
 
-
+                //validate refresh token
                 if (refreshTokenRecord.IsRevoked || refreshTokenRecord is null || refreshTokenRecord.ExpiredDate <= DateTime.UtcNow)
                 {
                     throw new AuthenticationException("Invalid or expired refresh token");
                 }
 
+                //get user by token
                 var user = await _unitOfWork.UserRepository.GetById(refreshTokenRecord.UserId);
 
+
+                //create new access token
                 var role = await _unitOfWork.RoleRepository.GetById(user.RoleId);
 
                 var roles = new List<string>
@@ -58,8 +64,10 @@ namespace ESCS.Application.Features.Commands.Authentications
 
                 var accessToken = TokenExtension.CreateAccessToken(user, roles, false);
 
+                //revoke old refresh token
                 await _tokenService.RevokeRefreshToken(request.RefreshToken);
 
+                //create new refresh token
                 var refreshToken = await _tokenService.SaveRefreshToken(user.Id);
 
                 var tokenResponse = new TokenResponse

@@ -30,22 +30,25 @@ namespace ESCS.Application.Features.Commands.ApiKeys
         }
 
 
-
+        //Handling update status of api key
         public async Task<BaseResult<long>> Handle(UpdateUserApiKeyStatusCommand request, CancellationToken cancellationToken)
         {
 
             try
             {
-
+                //get key by id
                 var key = await _unitOfWork.UserApiKeyRepository.FindEntityByQuery(k => k.Id == request.Id);
 
+                //if key not exist return
                 if (key is null)
                 {
                     throw new NotFoundException("Key not found");
                 }
 
+                //set status
                 key.IsActive = request.IsActive;
 
+                //updte to db
                 _unitOfWork.UserApiKeyRepository.Update(key);
 
                 await _unitOfWork.SaveChangesAsync();

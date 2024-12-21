@@ -97,7 +97,6 @@ namespace Logs.API.Controllers
         {
             var field = await _logService.GetLogResponseByCorrelationId(index, correlationId);
 
-
             return Ok(field);
         }
     }

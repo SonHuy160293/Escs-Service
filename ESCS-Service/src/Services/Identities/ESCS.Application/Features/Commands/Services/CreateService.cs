@@ -42,6 +42,7 @@ namespace ESCS.Application.Features.Commands.Services
                 //add object to db
                 await _unitOfWork.ServiceRepository.Add(service);
 
+                //save change
                 await _unitOfWork.SaveChangesAsync();
 
                 return BaseResult.Success();

@@ -1011,7 +1011,15 @@ namespace Logs.API.Services
                                 break;
 
                             case "equals":
-                                mustQueries.Add(new TermQuery(field: filter.Field)
+                                if (!filter.Type.Equals("text"))
+                                {
+                                    mustQueries.Add(new TermQuery(field: filter.Field)
+                                    {
+                                        Value = filter.Value
+                                    });
+                                }
+
+                                mustQueries.Add(new TermQuery(field: filter.Field + ".raw")
                                 {
                                     Value = filter.Value
                                 });
@@ -1024,8 +1032,16 @@ namespace Logs.API.Services
                                     Field = filter.Field
                                 });
 
+                                if (!filter.Type.Equals("text"))
+                                {
+                                    mustNotQueries.Add(new TermQuery(field: filter.Field)
+                                    {
+                                        Value = filter.Value
+                                    });
+                                }
+
                                 // Exclude documents where the field equals the specified value
-                                mustNotQueries.Add(new TermQuery(field: filter.Field)
+                                mustNotQueries.Add(new TermQuery(field: filter.Field + ".raw")
                                 {
                                     Value = filter.Value
                                 });
@@ -1081,12 +1097,16 @@ namespace Logs.API.Services
                                                                  "@timestamp",
                                                                  "fields.CorrelationId",
                                                                  "fields.RequestPath",
-                                                                 "level",
                                                                  "message",
                                                                  "fields.Method",
                                                                  "fields.StatusCode"
                                                                   })
                                             );
+
+                if (!response.IsValidResponse)
+                {
+                    throw new LogInternalException("Elasticsearch query failed.");
+                }
 
                 var logRecords = response.Hits.Select(hit => new LogRecord
                 {
@@ -1098,10 +1118,7 @@ namespace Logs.API.Services
                 }).ToList();
 
 
-                if (!response.IsValidResponse)
-                {
-                    throw new LogInternalException("Elasticsearch query failed.");
-                }
+
 
                 var countResponse = await _elasticSearchClient.CountAsync<LogRecord>(c => c.Indices(request.Index).Query(query));
 

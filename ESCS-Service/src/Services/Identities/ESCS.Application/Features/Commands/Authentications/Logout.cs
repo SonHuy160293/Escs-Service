@@ -30,11 +30,13 @@ namespace ESCS.Application.Features.Commands.Authentications
             _tokenService = tokenService;
         }
 
+
+        //handling logout
         public async Task<BaseResult> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
             try
             {
-
+                //revoke refresh token of user
                 await _tokenService.RevokeRefreshToken(request.RefreshToken);
 
                 return BaseResult.Success();

@@ -29,6 +29,8 @@ namespace ESCS.Application.Features.Commands.KeyAllowedEndpoints
             _logger = logger;
         }
 
+
+
         public async Task<BaseResult> Handle(UpdateKeyAllowedEndpointCommand request, CancellationToken cancellationToken)
         {
 

@@ -64,8 +64,10 @@ namespace ESCS.Application.Features.Commands.Authentications
                 role.Name,
             };
 
+                //create access token
                 var accessToken = TokenExtension.CreateAccessToken(user, roles, false);
 
+                //create refreshtoken
                 var refreshToken = await _tokenService.SaveRefreshToken(user.Id);
 
                 var TokenResponse = new TokenResponse

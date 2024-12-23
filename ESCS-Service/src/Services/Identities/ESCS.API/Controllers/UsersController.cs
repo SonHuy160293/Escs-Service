@@ -67,6 +67,13 @@ namespace ESCS.API.Controllers
             return Ok(userApiKeyCreatedResult.Data);
         }
 
+        [HttpPost("api-key-allowed-endpoint")]
+        public async Task<IActionResult> CreateApiKeyAllowedEndpoint(CreateApiKeyAllowedEndpointTransactionCommand createUserApiKeyCommand)
+        {
+            var userApiKeyCreatedResult = await _mediator.Send(createUserApiKeyCommand);
+            return Ok(userApiKeyCreatedResult.Succeeded);
+        }
+
         [HttpGet("api-key")]
         public async Task<IActionResult> GetAllUserApiKey()
         {

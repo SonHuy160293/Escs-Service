@@ -19,6 +19,8 @@ namespace ESCS.Application.Features.Commands.UserEmailServiceConfigs
         public string SmtpEmail { get; set; } = default!;
         public string SmtpPassword { get; set; } = default!;
         public int SmtpPort { get; set; }
+        public string SmtpServer { get; set; }
+        public bool IsEnableSsl { get; set; }
         public bool IsActive { get; set; }
 
 
@@ -72,6 +74,8 @@ namespace ESCS.Application.Features.Commands.UserEmailServiceConfigs
                 emailServiceConfig.SmtpEmail = request.SmtpEmail;
                 emailServiceConfig.SmtpPassword = request.SmtpPassword;
                 emailServiceConfig.IsActive = request.IsActive;
+                emailServiceConfig.SmtpServer = request.SmtpServer;
+                emailServiceConfig.IsEnableSsl = request.IsEnableSsl;
 
                 //update object
                 _unitOfWork.UserEmailServiceConfigurationRepository.Update(emailServiceConfig);

@@ -64,10 +64,12 @@ namespace ESCS.Grpc.Services
                         Id = (long)userEmailConfig.Id,
                         SmtpEmail = userEmailConfig.SmtpEmail,
                         SmtpPort = userEmailConfig.SmtpPort,
+                        SmtpServer = userEmailConfig.SmtpServer,
                         SmtpPassword = userEmailConfig.SmtpPassword,
                         UserId = userEmailConfig.UserId,
                         ServiceId = userEmailConfig.ServiceId,
-                        IsActive = userEmailConfig.IsActive
+                        IsActive = userEmailConfig.IsActive,
+                        IsEnableSsl = userEmailConfig.IsEnableSsl,
                     }
                 };
             }

@@ -14,6 +14,7 @@ namespace ESCS.Application.Features.Commands.UserEmailServiceConfigs
         public string SmtpEmail { get; set; } = default!;
         public string SmtpPassword { get; set; } = default!;
         public int SmtpPort { get; set; }
+        public string SmtpServer { get; set; } = default!;
 
         public long UserId { get; set; }
 
@@ -64,6 +65,7 @@ namespace ESCS.Application.Features.Commands.UserEmailServiceConfigs
 
                 //set default status to true
                 emailServiceConfig.IsActive = true;
+                emailServiceConfig.IsEnableSsl = true;
 
                 //add object
                 await _unitOfWork.UserEmailServiceConfigurationRepository.Add(emailServiceConfig);

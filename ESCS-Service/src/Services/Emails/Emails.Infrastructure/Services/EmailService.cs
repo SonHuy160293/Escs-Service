@@ -73,10 +73,10 @@ namespace Emails.Infrastructure.Services
                 }
 
                 // SMTP client configuration
-                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", userEmailConfig.SmtpPort))
+                using (SmtpClient smtp = new SmtpClient(userEmailConfig.SmtpServer, userEmailConfig.SmtpPort))
                 {
                     smtp.Credentials = new NetworkCredential(userEmailConfig.SmtpEmail, userEmailConfig.SmtpPassword);
-                    smtp.EnableSsl = true; // Enable SSL if required by your SMTP server
+                    smtp.EnableSsl = userEmailConfig.IsEnableSsl; // Enable SSL if required by your SMTP server
 
                     try
                     {

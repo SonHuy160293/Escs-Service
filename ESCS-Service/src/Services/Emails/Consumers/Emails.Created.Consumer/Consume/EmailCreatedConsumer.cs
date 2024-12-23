@@ -1,6 +1,8 @@
-﻿using Core.Application.Services;
+﻿using Core.Application.Common;
+using Core.Application.Services;
 using Core.Infrastructure.Services;
 using Emails.Application.Services;
+using Emails.Domain.Dtos;
 using Emails.Domain.Events;
 using Emails.Domain.Interfaces;
 using MassTransit;
@@ -38,53 +40,53 @@ namespace Emails.Created.Consumer.Consume
         {
             _logger.LogInformation("Consumer:{Consumer} consuming message with emailId:{EmailID}", typeof(EmailCreatedConsumer).Name, context.Message.EmailId);
 
-            //var email = await _emailRepository.GetEmailMessageByIdAsync(context.Message.EmailId);
+            var email = await _emailRepository.GetEmailMessageByIdAsync(context.Message.EmailId);
 
-            //var userEmailConfig = await _cachedUserEmailConfigRepository.GetUserEmailConfig(email.From);
+            var userEmailConfig = await _cachedUserEmailConfigRepository.GetUserEmailConfig(email.From);
 
-            //if (userEmailConfig is null)
-            //{
-            //    userEmailConfig = await _identityGrpcService.GetUserEmailConfig(email.From);
+            if (userEmailConfig is null)
+            {
+                userEmailConfig = await _identityGrpcService.GetUserEmailConfig(email.From);
 
-            //    await _cachedUserEmailConfigRepository.AddUserEmailConfig(userEmailConfig);
-            //}
-
-
-            //if (email is not null)
-            //{
-            //    await _emailService.SendEmailAsync(userEmailConfig, email);
+                await _cachedUserEmailConfigRepository.AddUserEmailConfig(userEmailConfig);
+            }
 
 
-            //    //call back
-            //    if (!string.IsNullOrEmpty(email.UrlCallback))
-            //    {
+            if (email is not null)
+            {
+                await _emailService.SendEmailAsync(userEmailConfig, email);
 
-            //        string receiverEmails = string.Join(",", email.To);
 
-            //        var requestBody = new CalbackRequestBody()
-            //        {
-            //            IsSent = true,
-            //            Message = $"Successfully sent mail to {receiverEmails}",
-            //            ObjectId = context.Message.ObjectId,
-            //        };
+                //call back
+                if (!string.IsNullOrEmpty(email.UrlCallback))
+                {
 
-            //        //check if callback url required authentication
-            //        var isCallBackAuthenticated = !string.IsNullOrEmpty(email.AuthenticationType) && !string.IsNullOrEmpty(email.Key);
+                    string receiverEmails = string.Join(",", email.To);
 
-            //        //declare httpCallOptions: isDeserialized, isRetry, requestBody, callBackUrl, authenticationType, key
-            //        var httpCallOptions = isCallBackAuthenticated ?
-            //              HttpCallOptions<CalbackRequestBody>.Authenticated(isSerialized: false, isRetry: true, requestBody, email.UrlCallback, null, email.AuthenticationType, email.Key) :
-            //              HttpCallOptions<CalbackRequestBody>.UnAuthenticated(isSerialized: false, isRetry: true, requestBody, email.UrlCallback, null);
+                    var requestBody = new CalbackRequestBody()
+                    {
+                        IsSent = true,
+                        Message = $"Successfully sent mail to {receiverEmails}",
+                        ObjectId = context.Message.ObjectId,
+                    };
 
-            //        //send request to callback url
-            //        var response = await _httpCaller.PostAsync<CalbackRequestBody, BaseHttpResult>(httpCallOptions);
-            //    }
+                    //check if callback url required authentication
+                    var isCallBackAuthenticated = !string.IsNullOrEmpty(email.AuthenticationType) && !string.IsNullOrEmpty(email.Key);
 
-            //}
-            //else
-            //{
-            //    throw new Exception("Can not find message");
-            //}
+                    //declare httpCallOptions: isDeserialized, isRetry, requestBody, callBackUrl, authenticationType, key
+                    var httpCallOptions = isCallBackAuthenticated ?
+                          HttpCallOptions<CalbackRequestBody>.Authenticated(isSerialized: false, isRetry: true, requestBody, email.UrlCallback, null, email.AuthenticationType, email.Key) :
+                          HttpCallOptions<CalbackRequestBody>.UnAuthenticated(isSerialized: false, isRetry: true, requestBody, email.UrlCallback, null);
+
+                    //send request to callback url
+                    var response = await _httpCaller.PostAsync<CalbackRequestBody, BaseHttpResult>(httpCallOptions);
+                }
+
+            }
+            else
+            {
+                throw new Exception("Can not find message");
+            }
         }
     }
 }

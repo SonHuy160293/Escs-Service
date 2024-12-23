@@ -3,6 +3,7 @@ using System;
 using ESCS.Infrastructure.Persistences;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 
@@ -11,9 +12,10 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace ESCS.Infrastructure.Migrations
 {
     [DbContext(typeof(EscsDbContext))]
-    partial class EscsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241223030805_updateEmailConfig")]
+    partial class updateEmailConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -10,10 +10,12 @@ message UserEmailConfig{
 	int64 id = 1;
     string smtpEmail = 2;
     int32 smtpPort = 3;
-    string smtpPassword = 4;
-    int64 userId = 5;
-    int64 serviceId = 6;
-	bool isActive = 7;
+	string smtpServer = 4;
+    string smtpPassword = 5;
+    int64 userId = 6;
+    int64 serviceId = 7;
+	bool isActive = 8;
+	bool isEnableSsl = 9;
 }
 
 message ValidateUserApiKeyRequest{

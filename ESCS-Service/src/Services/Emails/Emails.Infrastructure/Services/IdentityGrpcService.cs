@@ -39,7 +39,9 @@ namespace Emails.Infrastructure.Services
                 SmtpPort = response.UserEmailConfig.SmtpPort,
                 SmtpPassword = response.UserEmailConfig.SmtpPassword,
                 UserId = response.UserEmailConfig.UserId,
-                ServiceId = response.UserEmailConfig.ServiceId
+                ServiceId = response.UserEmailConfig.ServiceId,
+                SmtpServer = response.UserEmailConfig.SmtpServer,
+                IsEnableSsl = response.UserEmailConfig.IsEnableSsl,
             };
         }
 

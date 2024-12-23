@@ -62,8 +62,7 @@ namespace ESCS.Application.Features.Commands.ApiKeys
                 //add key to db
                 await _unitOfWork.UserApiKeyRepository.Add(userApiKey);
 
-                //save changes
-                await _unitOfWork.SaveChangesAsync();
+
 
                 return BaseResult<long>.Success(userApiKey.Id);
             }

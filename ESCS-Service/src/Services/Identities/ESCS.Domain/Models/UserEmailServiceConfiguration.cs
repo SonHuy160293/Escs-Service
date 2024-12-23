@@ -6,8 +6,10 @@ namespace ESCS.Domain.Models
     public class UserEmailServiceConfiguration : BaseEntity
     {
         public string SmtpEmail { get; set; } = default!;
+        public string SmtpServer { get; set; } = "smtp.gmail.com";
         public string SmtpPassword { get; set; } = default!;
         public int SmtpPort { get; set; }
+        public bool IsEnableSsl { get; set; }
 
 
         public long UserId { get; set; }

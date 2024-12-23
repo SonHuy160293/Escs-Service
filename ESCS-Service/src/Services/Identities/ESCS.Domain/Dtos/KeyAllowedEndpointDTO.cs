@@ -19,10 +19,12 @@ namespace ESCS.Domain.Dtos
 
     public class KeyAllowedEndpointDetailDto
     {
+        public long Id { get; set; }
         public bool IsActive { get; set; }
         public string Method { get; set; }
         public string Url { get; set; }
         public string Description { get; set; }
+        public long EndpointId { get; set; }
     }
 
     public class ServiceEndpointRegisterByUserGetDto

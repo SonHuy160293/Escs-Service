@@ -1,4 +1,5 @@
 ﻿using ESCS.Application.Features.Commands.ApiKeys;
+using ESCS.Application.Features.Commands.KeyAllowedEndpoints;
 using ESCS.Application.Features.Commands.UserEmailServiceConfigs;
 using ESCS.Application.Features.Commands.Users;
 using ESCS.Application.Features.Queries.ApiKeys;
@@ -123,12 +124,32 @@ namespace ESCS.API.Controllers
             return Ok(userApiKeyQueryResult.Data);
         }
 
+        [HttpGet("api-key/{id}/detail")]
+        public async Task<IActionResult> GetUserApiKeyDetailById(long id)
+        {
+            var getUserApiKeyDetailByIdQuery = new GetUserApiKeyDetailByIdQuery()
+            {
+                Id = id
+            };
+
+            var getUserApiKeyDetailByIdQueryResult = await _mediator.Send(getUserApiKeyDetailByIdQuery);
+            return Ok(getUserApiKeyDetailByIdQueryResult.Data);
+        }
+
         [HttpPut("api-key")]
         public async Task<IActionResult> UpdateApiKeyStatus(UpdateUserApiKeyStatusCommand updateUserApiKeyStatusCommand)
         {
 
             var updateUserApiKeyStatusResult = await _mediator.Send(updateUserApiKeyStatusCommand);
             return Ok(updateUserApiKeyStatusResult.Data);
+        }
+
+        [HttpPut("api-key-allowed")]
+        public async Task<IActionResult> UpdateApiKeyAllowed(UpdateEndpointOfKeyCommand updateEndpointOfKeyCommand)
+        {
+
+            var updateEndpointOfKeyResult = await _mediator.Send(updateEndpointOfKeyCommand);
+            return Ok(updateEndpointOfKeyResult);
         }
 
 

@@ -126,6 +126,11 @@ namespace Core.Infrastructure.Persistences
             return queryable.ToList();
         }
 
+        public void DeleteRange(List<T> items)
+        {
+            _logger.LogInformation("DELETING {Object} entities from database", typeof(T).Name);
 
+            _context.Set<T>().RemoveRange(items);
+        }
     }
 }

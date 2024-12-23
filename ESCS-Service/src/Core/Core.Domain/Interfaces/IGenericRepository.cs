@@ -7,6 +7,7 @@ namespace Core.Domain.Interfaces
     {
         Task Add(T item);
         void Delete(T item);
+        void DeleteRange(List<T> items);
         Task<T> GetById(long id, params Expression<Func<T, object>>[]? includeProperties);
         Task<List<T>> FindByQuery(Expression<Func<T, bool>> expression, bool tracking = true, params Expression<Func<T, object>>[]? includeProperties);
 

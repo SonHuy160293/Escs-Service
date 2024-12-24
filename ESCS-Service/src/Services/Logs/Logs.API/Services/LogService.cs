@@ -1081,6 +1081,17 @@ namespace Logs.API.Services
                 {
                     sortOrder = SortOrder.Asc;
                 }
+
+                var defaultIncludes = new[]
+                {
+                    "@timestamp",
+                    "fields.CorrelationId",
+                    "level",
+                    "message",
+                };
+
+                // Convert the Includes list to an array if it is provided, otherwise use the defaultIncludes
+                var sourceIncludes = request.Includes?.Any() == true ? request.Includes.ToArray() : defaultIncludes;
                 var query = new BoolQuery { Must = mustQueries, MustNot = mustNotQueries };
                 // Execute the search
                 var response = await _elasticSearchClient.SearchAsync<LogRecord>(s => s
@@ -1092,15 +1103,8 @@ namespace Logs.API.Services
                                             }))
                                             .From(request.PageIndex * request.PageSize)
                                             .Size(request.PageSize)
-                                            .SourceIncludes(new[]
-                                                                 {
-                                                                 "@timestamp",
-                                                                 "fields.CorrelationId",
-                                                                 "fields.RequestPath",
-                                                                 "message",
-                                                                 "fields.Method",
-                                                                 "fields.StatusCode"
-                                                                  })
+                                            .SourceIncludes(sourceIncludes)
+                                            .RequestCache(true)  // Enable query caching for repeated searches
                                             );
 
                 if (!response.IsValidResponse)

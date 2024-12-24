@@ -67,6 +67,7 @@ namespace Logs.API.Models
     {
         public string Index { get; set; }
         public string SearchTerm { get; set; }
+        public List<string>? Includes { get; set; }
         public List<Filter> Filters { get; set; } = new List<Filter>();
         // Add StartDate and EndDate properties
         public string StartDate { get; set; }  // Preferably use string if you're receiving date as string from frontend

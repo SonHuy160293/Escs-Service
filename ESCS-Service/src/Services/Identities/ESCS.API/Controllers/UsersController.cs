@@ -149,7 +149,7 @@ namespace ESCS.API.Controllers
         {
 
             var updateEndpointOfKeyResult = await _mediator.Send(updateEndpointOfKeyCommand);
-            return Ok(updateEndpointOfKeyResult);
+            return Ok(updateEndpointOfKeyResult.Succeeded);
         }
 
 

@@ -22,6 +22,7 @@ namespace Core.Application.Helpers
             if (!IsFileSizeWithinLimit(file, maxSizeInBytes))
             {
                 throw new ValidationException($"File {file.FileName} size is over {maxSizeInBytes}");
+
             }
 
             return true;
@@ -43,7 +44,12 @@ namespace Core.Application.Helpers
 
         private static bool IsFileFormatValid(IFormFile file, string[] allowedExtensions)
         {
-            using var reader = new BinaryReader(file.OpenReadStream());
+            // Load the file into a memory stream
+            using var memoryStream = new MemoryStream();
+            file.CopyTo(memoryStream);
+
+            // Reset the position of the memory stream
+            memoryStream.Position = 0;
 
             // Create a dictionary with only the allowed extensions and their respective signatures
             var fileSignatures = new Dictionary<string, List<byte[]>>();
@@ -62,11 +68,14 @@ namespace Core.Application.Helpers
             int maxSignatureLength = signatures.Max(s => s.Length);
 
             // Read the appropriate number of bytes from the file's header
-            var headerBytes = reader.ReadBytes(maxSignatureLength);
+            memoryStream.Position = 0;
+            var headerBytes = new byte[maxSignatureLength];
+            memoryStream.Read(headerBytes, 0, maxSignatureLength);
 
             // Check if any allowed signature matches the beginning of the file's header bytes
             return signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
         }
+
 
 
         // dictionary file signature of same file type
